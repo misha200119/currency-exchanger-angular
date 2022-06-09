@@ -1,0 +1,116 @@
+<div
+  class="
+    container
+    row
+    shadow-lg
+    p-3
+    mb-1
+    bg-body
+    rounded"
+  [formGroup]="exchangeForm"
+>
+  <div class="
+    d-flex
+    flex-row
+    justify-content-center
+    align-items-center"
+  >
+    <h2>
+      USD:
+      <span>
+        {{rates['UAH'] | currency:'UAH'}}
+      </span>
+    </h2>
+
+    <h2 class="p-3">
+      ||
+    </h2>
+
+    <h2>
+      EUR:
+      <span>
+        {{rates['UAH'] / rates['EUR'] | currency:'UAH'}}
+      </span>
+    </h2>
+  </div>
+
+  <div class="col">
+    <div class="mb-4">
+      <input
+      type="string"
+      class="form-control"
+      id="fromAmount"
+      formControlName="fromAmount"
+      >
+
+      <div
+        *ngIf="fromAmount?.invalid && (fromAmount?.dirty || fromAmount?.touched)"
+        class="invalid-field-error-description"
+      >
+        Please provide right value
+      </div>
+    </div>
+
+    <input
+      type="string"
+      class="form-control"
+      id="toAmount"
+      formControlName="toAmount"
+    >
+
+    <div
+      *ngIf="toAmount?.invalid && (toAmount?.dirty || toAmount?.touched)"
+      class="invalid-field-error-description"
+    >
+      Please provide right value
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="mb-4">
+      <select
+        class="form-select"
+        id="from"
+        formControlName="from"
+      >
+        <option selected disabled value="">Choose...</option>
+
+        <option
+          *ngFor="let name of rates | keyvalue"
+          value={{name.key}}
+        >
+          {{ name.key }}
+        </option>
+      </select>
+
+      <div
+        *ngIf="from?.invalid && (from?.dirty || from?.touched)"
+        class="invalid-field-error-description"
+      >
+        Please select some currency
+      </div>
+    </div>
+
+    <select
+      class="form-select"
+      id="to"
+      formControlName="to"
+    >
+      <option selected disabled value="">Choose...</option>
+
+      <option
+        *ngFor="let name of rates | keyvalue"
+        value={{name.key}}
+      >
+        {{ name.key }}
+      </option>
+    </select>
+
+    <div
+      *ngIf="to?.invalid && (to?.dirty || to?.touched)"
+      class="invalid-field-error-description"
+    >
+      Please select some currency
+    </div>
+  </div>
+</div>
