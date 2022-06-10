@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CurrencyDataFromApi, Rates } from 'src/types/CurrencyDataFromApi';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { calculateChangedValue } from '../../functions/calculateChangedValue';
-import { CurrencyRateQueries } from 'src/api/CurrencyRateQueries';
+import { CurrencyRateQueries } from 'src/api/currencyRateQueries';
 
 @Component({
   selector: 'exchange-from',
