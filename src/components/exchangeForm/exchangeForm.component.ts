@@ -1,7 +1,8 @@
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { Rates } from 'src/types/CurrencyDataFromApi';
-import { x as rawData } from '../../api/testDataFromApi';
+import { Component, OnInit } from '@angular/core';
+import { CurrencyDataFromApi, Rates } from 'src/types/CurrencyDataFromApi';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { calculateChangedValue } from '../../functions/calculateChangedValue';
+import { CurrencyRateQueries } from 'src/api/CurrencyRateQueries';
 
 @Component({
   selector: 'exchange-from',
@@ -29,19 +30,86 @@ export class ExchangeForm implements OnInit {
   get to() {return this.exchangeForm.get('to')}
   get toAmount() {return this.exchangeForm.get('toAmount')}
 
-  constructor() {
-    this.exchangeForm.valueChanges.subscribe(changes => {
-      if (this.to?.valid
-        && this.from?.valid
-        && this.fromAmount?.valid
-        && this.toAmount?.valid) {
-        console.log('can calculate');
+  constructor(private currencyAPI: CurrencyRateQueries) {
+  }
 
+  calculate(changedFieldName: string) {
+    const {to, from, fromAmount, toAmount, rates} = this;
+
+    if ( this.fromAmount?.valid || this.toAmount?.valid) {
+      if (
+        typeof fromAmount?.value === 'string' &&
+        typeof toAmount?.value === 'string' &&
+        from?.value &&
+        to?.value
+      ) {
+        let config = {
+          to: fromAmount.value ? from.value : to.value,
+          from: fromAmount.value ? to.value : from.value,
+          fromAmount: fromAmount.value || toAmount.value,
+          rates: rates,
+        };
+        let changedAmount: string = '';
+
+        switch (changedFieldName) {
+          case 'fromAmount':
+          case 'from':
+          case 'to':
+            if (Number(fromAmount.value)) {
+              changedAmount = 'toAmount';
+              config = {
+                to: to.value,
+                from: from.value,
+                fromAmount: fromAmount.value,
+                rates: rates,
+              };
+            } else {
+              changedAmount = 'fromAmount';
+              config = {
+                to: from.value,
+                from: to.value,
+                fromAmount: toAmount.value,
+                rates: rates,
+              };
+            }
+            break;
+          case 'toAmount':
+            if (Number(toAmount.value)) {
+              changedAmount = 'fromAmount';
+              config = {
+                to: from.value,
+                from: to.value,
+                fromAmount: toAmount.value,
+                rates: rates,
+              };
+            } else {
+              changedAmount = 'toAmount';
+              config = {
+                to: to.value,
+                from: from.value,
+                fromAmount: fromAmount.value,
+                rates: rates,
+              };
+            }
+            break;
+        }
+        const calculated = calculateChangedValue(config);
+
+        this.exchangeForm.patchValue({
+          [changedAmount]: String(calculated),
+        });
       }
-    });
+    }
+  }
+
+  onChange(e: Event) {
+    const element = e.currentTarget as HTMLInputElement;
+    this.calculate(element.id);
   }
 
   ngOnInit() {
-    this.rates = rawData.rates;
+    this.currencyAPI.getData().subscribe((dataFromServer) => {
+      this.rates = (dataFromServer as CurrencyDataFromApi).rates;
+    });
   }
 }

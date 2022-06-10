@@ -41,6 +41,7 @@
       class="form-control"
       id="fromAmount"
       formControlName="fromAmount"
+      (change)="onChange($event)"
       >
 
       <div
@@ -56,6 +57,7 @@
       class="form-control"
       id="toAmount"
       formControlName="toAmount"
+      (change)="onChange($event)"
     >
 
     <div
@@ -72,6 +74,7 @@
         class="form-select"
         id="from"
         formControlName="from"
+        (change)="onChange($event)"
       >
         <option selected disabled value="">Choose...</option>
 
@@ -95,6 +98,7 @@
       class="form-select"
       id="to"
       formControlName="to"
+      (change)="onChange($event)"
     >
       <option selected disabled value="">Choose...</option>
 
@@ -113,4 +117,7 @@
       Please select some currency
     </div>
   </div>
+  <h5 class="p-3">
+    Please press ENTER or TAB after set values
+  </h5>
 </div>
