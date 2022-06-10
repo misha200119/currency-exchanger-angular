@@ -36,69 +36,43 @@ export class ExchangeForm implements OnInit {
   calculate(changedFieldName: string) {
     const {to, from, fromAmount, toAmount, rates} = this;
 
-    if ( this.fromAmount?.valid || this.toAmount?.valid) {
-      if (
-        typeof fromAmount?.value === 'string' &&
-        typeof toAmount?.value === 'string' &&
-        from?.value &&
-        to?.value
-      ) {
-        let config = {
-          to: fromAmount.value ? from.value : to.value,
-          from: fromAmount.value ? to.value : from.value,
-          fromAmount: fromAmount.value || toAmount.value,
+    if (
+      (this.fromAmount?.valid || this.toAmount?.valid)
+      && typeof fromAmount?.value === 'string'
+      && typeof toAmount?.value === 'string'
+      && from?.value
+      && to?.value
+    ) {
+      let config = {
+        to: fromAmount.value ? from.value : to.value,
+        from: fromAmount.value ? to.value : from.value,
+        fromAmount: fromAmount.value || toAmount.value,
+        rates: rates,
+      };
+      let changedAmount: string = '';
+
+      if (Number(fromAmount.value) || !Number(toAmount.value)) {
+        changedAmount = 'toAmount';
+        config = {
+          to: to.value,
+          from: from.value,
+          fromAmount: fromAmount.value,
           rates: rates,
         };
-        let changedAmount: string = '';
-
-        switch (changedFieldName) {
-          case 'fromAmount':
-          case 'from':
-          case 'to':
-            if (Number(fromAmount.value)) {
-              changedAmount = 'toAmount';
-              config = {
-                to: to.value,
-                from: from.value,
-                fromAmount: fromAmount.value,
-                rates: rates,
-              };
-            } else {
-              changedAmount = 'fromAmount';
-              config = {
-                to: from.value,
-                from: to.value,
-                fromAmount: toAmount.value,
-                rates: rates,
-              };
-            }
-            break;
-          case 'toAmount':
-            if (Number(toAmount.value)) {
-              changedAmount = 'fromAmount';
-              config = {
-                to: from.value,
-                from: to.value,
-                fromAmount: toAmount.value,
-                rates: rates,
-              };
-            } else {
-              changedAmount = 'toAmount';
-              config = {
-                to: to.value,
-                from: from.value,
-                fromAmount: fromAmount.value,
-                rates: rates,
-              };
-            }
-            break;
-        }
-        const calculated = calculateChangedValue(config);
-
-        this.exchangeForm.patchValue({
-          [changedAmount]: String(calculated),
-        });
+      } else {
+        changedAmount = 'fromAmount';
+        config = {
+          to: from.value,
+          from: to.value,
+          fromAmount: toAmount.value,
+          rates: rates,
+        };
       }
+      const calculated = calculateChangedValue(config);
+
+      this.exchangeForm.patchValue({
+        [changedAmount]: String(calculated),
+      });
     }
   }
 
