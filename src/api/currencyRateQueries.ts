@@ -24,7 +24,7 @@ export class CurrencyRateQueries {
   constructor(private http: HttpClient) { }
 
   getData() {
-    return this.http.get(altFreeBaseURL);
+    return this.http.get(altFreeBaseURL + '?base=USD');
   }
 }
 

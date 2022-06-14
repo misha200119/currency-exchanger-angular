@@ -36,22 +36,24 @@ export class ExchangeForm implements OnInit {
   calculate(changedFieldName: string) {
     const {to, from, fromAmount, toAmount, rates} = this;
 
-    if (
-      (this.fromAmount?.valid || this.toAmount?.valid)
-      && typeof fromAmount?.value === 'string'
-      && typeof toAmount?.value === 'string'
-      && from?.value
-      && to?.value
-    ) {
-      let config = {
-        to: fromAmount.value ? from.value : to.value,
-        from: fromAmount.value ? to.value : from.value,
-        fromAmount: fromAmount.value || toAmount.value,
-        rates: rates,
-      };
-      let changedAmount: string = '';
+    const isFromAmountValid = this.fromAmount?.valid
+      && fromAmount?.value
+      && (changedFieldName === 'fromAmount' || changedFieldName === 'from');
 
-      if (Number(fromAmount.value) || !Number(toAmount.value)) {
+    const isToAmountValid = this.toAmount?.valid
+      && toAmount?.value
+      && (changedFieldName === 'toAmount' || changedFieldName === 'to');
+
+    console.log(isFromAmountValid, isToAmountValid)
+    if ((isFromAmountValid || isToAmountValid)
+      && from?.value && to?.value) {
+      let config;
+      let changedAmount: string = '';
+      let calculated;
+
+      if ((changedFieldName === 'fromAmount'
+      || changedFieldName === 'from')
+      && fromAmount?.value) {
         changedAmount = 'toAmount';
         config = {
           to: to.value,
@@ -59,7 +61,8 @@ export class ExchangeForm implements OnInit {
           fromAmount: fromAmount.value,
           rates: rates,
         };
-      } else {
+        calculated = calculateChangedValue(config);
+      } else if (toAmount?.value){
         changedAmount = 'fromAmount';
         config = {
           to: from.value,
@@ -67,8 +70,8 @@ export class ExchangeForm implements OnInit {
           fromAmount: toAmount.value,
           rates: rates,
         };
+        calculated = calculateChangedValue(config);
       }
-      const calculated = calculateChangedValue(config);
 
       this.exchangeForm.patchValue({
         [changedAmount]: String(calculated),
